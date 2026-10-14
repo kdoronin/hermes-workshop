@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "installation_policy": "explicit-selection-only",
+  "modules": [
+    {
+      "id": "basic-agent-rules",
+      "file": "basic-agent-rules.md",
+      "title": "Базовые правила",
+      "kind": "rules",
+      "requires": [],
+      "recommended_for_start": true,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "russian-natural-voice",
+      "file": "russian-natural-voice.md",
+      "title": "Русский текст",
+      "kind": "skill",
+      "requires": [],
+      "recommended_for_start": true,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "safety-rule",
+      "file": "safety-rule.md",
+      "title": "Подтверждение внешних действий",
+      "kind": "rules",
+      "requires": [],
+      "recommended_for_start": true,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "meeting-transcript-analysis",
+      "file": "meeting-transcript-analysis.md",
+      "title": "Разбор встреч и заметок",
+      "kind": "skill",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "document-feedback-learning",
+      "file": "document-feedback-learning.md",
+      "title": "Обучение на замечаниях к документам",
+      "kind": "skill",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "llm-wiki-hermes-setup",
+      "file": "llm-wiki-hermes-setup.md",
+      "title": "LLM Wiki",
+      "kind": "setup",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "knowledge-state-corrections",
+      "file": "knowledge-state-corrections.md",
+      "title": "Исправление памяти",
+      "kind": "skill",
+      "requires": [
+        "llm-wiki-hermes-setup"
+      ],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "book-library-setup",
+      "file": "book-library-setup.md",
+      "title": "Личная библиотека",
+      "kind": "skill",
+      "requires": [
+        "llm-wiki-hermes-setup"
+      ],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "process-material",
+      "file": "process-material.md",
+      "title": "Обработка материалов",
+      "kind": "setup",
+      "requires": [
+        "llm-wiki-hermes-setup"
+      ],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "whisper-setup",
+      "file": "whisper-setup.md",
+      "title": "Распознавание голоса",
+      "kind": "setup",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "resources",
+      "default_selected": false
+    },
+    {
+      "id": "playwriter-setup",
+      "file": "playwriter-setup.md",
+      "title": "Управление Chrome",
+      "kind": "setup",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "browser-access",
+      "default_selected": false
+    },
+    {
+      "id": "telegram-reactions",
+      "file": "telegram-reactions.md",
+      "title": "Реакции Telegram",
+      "kind": "setting",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
+      "id": "telegram-thread-title-icon",
+      "file": "telegram-thread-title-icon.md",
+      "title": "Названия и значки тем Telegram",
+      "kind": "skill",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "external-write",
+      "default_selected": false
+    },
+    {
+      "id": "keep-awake",
+      "file": "keep-awake.md",
+      "title": "Запрет автоматического сна",
+      "kind": "setting",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "power",
+      "default_selected": false
+    },
+    {
+      "id": "hermes-auto-approve",
+      "file": "hermes-auto-approve.md",
+      "title": "Автоодобрение команд",
+      "kind": "setting",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "high",
+      "default_selected": false
+    }
+  ]
+}
