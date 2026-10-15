@@ -119,6 +119,16 @@
       "default_selected": false
     },
     {
+      "id": "hide-tool-calls",
+      "file": "hide-tool-calls.md",
+      "title": "Скрывать вызовы инструментов",
+      "kind": "setting",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "normal",
+      "default_selected": false
+    },
+    {
       "id": "telegram-reactions",
       "file": "telegram-reactions.md",
       "title": "Реакции Telegram",
