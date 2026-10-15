@@ -66,6 +66,29 @@ class ValidationTests(unittest.TestCase):
         (self.root / "demo.md").write_text("Path: /Users/example/private\n", encoding="utf-8")
         self.assertFalse(validator.validate(self.root)["ok"])
 
+    def test_private_data_patterns(self):
+        examples = [
+            "/home/example/private", r"C:\Users\Example\private",
+            "chat_id: -1001234567890", "TELEGRAM_ALLOWED_USERS=123456789",
+            "TELEGRAM_BOT_TOKEN=" + "123456789:" + "A" * 35,
+        ]
+        for value in examples:
+            with self.subTest(value=value):
+                (self.root / "demo.md").write_text(value, encoding="utf-8")
+                self.assertFalse(validator.validate(self.root)["ok"])
+
+    def test_private_data_outside_modules(self):
+        for source in ("catalog", "extra-markdown"):
+            with self.subTest(source=source):
+                if source == "catalog":
+                    self.catalog["note"] = "Path: /home/example/private"
+                    self.save_catalog()
+                else:
+                    self.catalog.pop("note", None)
+                    self.save_catalog()
+                    (self.root / "notes.md").write_text("Path: /home/example/private", encoding="utf-8")
+                self.assertFalse(validator.validate(self.root)["ok"])
+
     def test_unclosed_fence(self):
         (self.root / "demo.md").write_text("```text\nunclosed\n", encoding="utf-8")
         self.assertFalse(validator.validate(self.root)["ok"])

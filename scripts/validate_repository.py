@@ -12,7 +12,12 @@ SKILL_FILES = {
     "meeting-transcript-analysis.md", "book-library-setup.md",
     "document-feedback-learning.md", "telegram-thread-title-icon.md",
 }
-PRIVATE_MARKERS = ("/Users/", "kdoronin", "268071163", "1512453", "20260909_", "Константин", "Даша")
+# Detect data shapes rather than retaining the author's private identifiers.
+PRIVATE_PATTERNS = (
+    ("absolute home path", r"(?:/Users/|/home/|[A-Za-z]:\\Users\\)[^\s`<>]+"),
+    ("numeric messaging ID", r"(?i)\b(?:chat_id|message_thread_id|user_id|TELEGRAM_ALLOWED_USERS|TELEGRAM_HOME_CHANNEL)\b[\"'\s:=]+-?\d{5,}"),
+    ("bot token", r"\b\d{6,12}:[A-Za-z0-9_-]{30,}\b"),
+)
 
 
 def fenced_blocks(text):
@@ -59,7 +64,10 @@ def validate(root):
     except OSError:
         readme = ""
         errors.append("README.md missing")
-    texts = {"README.md": readme}
+    texts = {"README.md": readme, "modules.json": json.dumps(catalog, ensure_ascii=False)}
+    for path in root.glob("*.md"):
+        if path.is_file() and path.resolve().parent == root:
+            texts[path.name] = path.read_text(encoding="utf-8")
     graph = {}
     for row in modules:
         if not isinstance(row, dict):
@@ -134,9 +142,9 @@ def validate(root):
     for mid in graph:
         visit(mid)
     for filename, text in texts.items():
-        for marker in PRIVATE_MARKERS:
-            if marker in text:
-                errors.append(f"{filename}: personal marker {marker!r}")
+        for label, pattern in PRIVATE_PATTERNS:
+            if re.search(pattern, text):
+                errors.append(f"{filename}: possible private data ({label})")
     for target in re.findall(r"\]\(([^)]+)\)", readme):
         if "://" in target or target.startswith("#"):
             continue
