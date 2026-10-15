@@ -89,6 +89,12 @@ class ValidationTests(unittest.TestCase):
                     (self.root / "notes.md").write_text("Path: /home/example/private", encoding="utf-8")
                 self.assertFalse(validator.validate(self.root)["ok"])
 
+    def test_installer_links_and_fences(self):
+        for text in ("[Missing](missing.md)\n", "```bash\nunclosed\n"):
+            with self.subTest(text=text):
+                (self.root / "INSTALLER.md").write_text(text)
+                self.assertFalse(validator.validate(self.root)["ok"])
+
     def test_unclosed_fence(self):
         (self.root / "demo.md").write_text("```text\nunclosed\n", encoding="utf-8")
         self.assertFalse(validator.validate(self.root)["ok"])

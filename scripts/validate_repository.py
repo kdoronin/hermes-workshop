@@ -141,17 +141,73 @@ def validate(root):
 
     for mid in graph:
         visit(mid)
+    hooks_path = root / "hooks.json"
+    hook_count = 0
+    if hooks_path.exists():
+        try:
+            hooks_catalog = json.loads(hooks_path.read_text(encoding="utf-8"))
+            texts["hooks.json"] = json.dumps(hooks_catalog, ensure_ascii=False)
+            if hooks_catalog.get("schema_version") != 1 or hooks_catalog.get("installation_policy") != "explicit-selection-only":
+                errors.append("hooks.json: unsupported schema or selection policy")
+            hooks = hooks_catalog["hooks"]
+            if not isinstance(hooks, list) or not hooks:
+                raise ValueError("nonempty hook list required")
+            hook_count = len(hooks)
+            hook_ids, groups = set(), set()
+            for hook in hooks:
+                if not isinstance(hook, dict):
+                    raise ValueError("hook must be an object")
+                hid = hook.get("id")
+                if not isinstance(hid, str) or not re.fullmatch(r"[a-z0-9-]+", hid) or hid in hook_ids:
+                    errors.append("hooks.json: invalid or duplicate hook ID")
+                else:
+                    hook_ids.add(hid)
+                domain, cadence = hook.get("domain"), hook.get("cadence")
+                if domain not in ("personal", "work") or cadence not in ("daily", "weekly", "calendar-event"):
+                    errors.append("hooks.json: invalid domain or cadence")
+                else:
+                    groups.add((domain, cadence))
+                for field in ("title", "purpose", "prompt_template"):
+                    if not isinstance(hook.get(field), str) or not hook[field].strip():
+                        errors.append(f"hooks.json: missing {field}")
+                prompt = hook.get("prompt_template", "")
+                if isinstance(prompt, str):
+                    allowed = {"scope", "period", "sources", "runtime_context"}
+                    if cadence == "calendar-event":
+                        allowed |= {"event_ref", "event_time"}
+                    variables = set(re.findall(r"\{\{\s*([^{}]+?)\s*\}\}", prompt))
+                    if variables - allowed:
+                        errors.append("hooks.json: unknown template variable")
+                requirements = hook.get("requires")
+                if not isinstance(requirements, list) or any(item not in ("calendar", "wiki") for item in requirements):
+                    errors.append("hooks.json: invalid requirements")
+                elif cadence == "calendar-event" and "calendar" not in requirements:
+                    errors.append("hooks.json: calendar event without calendar requirement")
+                if hook.get("default_selected") is not False:
+                    errors.append("hooks.json: hook selected by default")
+            expected_groups = {(domain, cadence) for domain in ("personal", "work") for cadence in ("daily", "weekly", "calendar-event")}
+            if groups != expected_groups:
+                errors.append("hooks.json: missing personal/work daily, weekly or calendar-event group")
+        except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+            errors.append(f"hooks.json: invalid catalog ({type(exc).__name__})")
     for filename, text in texts.items():
         for label, pattern in PRIVATE_PATTERNS:
             if re.search(pattern, text):
                 errors.append(f"{filename}: possible private data ({label})")
-    for target in re.findall(r"\]\(([^)]+)\)", readme):
-        if "://" in target or target.startswith("#"):
+    for filename, text in texts.items():
+        if not filename.endswith(".md"):
             continue
-        path = root / target.split("#", 1)[0]
-        if not path.exists() or not path.resolve().is_relative_to(root):
-            errors.append(f"README.md: broken/unsafe local link {target}")
-    return {"ok": not errors, "modules": len(modules), "skills": skills, "errors": errors}
+        if filename not in filenames:
+            _, unclosed = fenced_blocks(text)
+            if unclosed:
+                errors.append(f"{filename}: unclosed fence at line {unclosed[2]}")
+        for target in re.findall(r"\]\(([^)]+)\)", text):
+            if "://" in target or target.startswith("#"):
+                continue
+            path = root / target.split("#", 1)[0]
+            if not path.exists() or not path.resolve().is_relative_to(root):
+                errors.append(f"{filename}: broken/unsafe local link {target}")
+    return {"ok": not errors, "modules": len(modules), "hooks": hook_count, "skills": skills, "errors": errors}
 
 
 def main():

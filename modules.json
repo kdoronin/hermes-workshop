@@ -129,6 +129,26 @@
       "default_selected": false
     },
     {
+      "id": "personal-hooks",
+      "file": "personal-hooks.md",
+      "title": "Обращения для личной эффективности",
+      "kind": "setup",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "scheduled-messages",
+      "default_selected": false
+    },
+    {
+      "id": "work-hooks",
+      "file": "work-hooks.md",
+      "title": "Рабочие обращения",
+      "kind": "setup",
+      "requires": [],
+      "recommended_for_start": false,
+      "risk": "scheduled-messages",
+      "default_selected": false
+    },
+    {
       "id": "telegram-reactions",
       "file": "telegram-reactions.md",
       "title": "Реакции Telegram",
