@@ -31,6 +31,19 @@ class OnboardingContractTests(unittest.TestCase):
             check.update(passed=True, evidence='synthetic reference')
         self.assertTrue(checker.validate_state(state, catalog)['ok'])
 
+    def test_openai_oauth_is_recommended_with_user_choice(self):
+        for filename in ('INSTALLER.md', 'README.md', 'ONBOARDING.md'):
+            text = (ROOT / filename).read_text()
+            with self.subTest(filename=filename):
+                self.assertIn('OpenAI Codex через OAuth — первый рекомендуемый вариант', text)
+                self.assertIn('hermes model', text)
+        text = (ROOT / 'INSTALLER.md').read_text()
+        self.assertIn('ChatGPT or Codex Subscription', text)
+        self.assertIn('Не переключай провайдера автоматически', text)
+        self.assertIn('Nous Portal', text)
+        self.assertIn('OpenRouter', text)
+        self.assertIn('не фиксируй авторскую модель', text)
+
     def test_entry_points_link_complete_route(self):
         for filename in ('README.md', 'INSTALLER.md'):
             text = (ROOT / filename).read_text()
